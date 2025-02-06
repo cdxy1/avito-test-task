@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ..models.user import UserModel
 from ..db import database
-from ..schemas.user import UserSchema, UserInSchema
+from ..schemas.user import UserDBSchema, UserSchema, UserInSchema
 from ..schemas.token import TokenSchema
 from ..utils.hasher import hash_password, verify_password
 from ..utils.token_utils import create_access_token, decode_access_token
@@ -21,8 +21,10 @@ async def register(
     session: Annotated[AsyncSession, Depends(database.get_session)],
 ):
     user_dict = user.model_dump()
-    user_dict["password"] = hash_password(user.password)
-    new_user = UserModel(**user_dict)
+    user_db_dict = UserDBSchema(**user_dict).model_dump()
+
+    user_db_dict["password"] = hash_password(user.password)
+    new_user = UserModel(**user_db_dict)
     session.add(new_user)
     try:
         await session.commit()
