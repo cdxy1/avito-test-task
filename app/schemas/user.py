@@ -12,3 +12,8 @@ class UserInSchema(UserSchema):
 class UserDBSchema(UserInSchema):
     role: str = "user"
     is_active: bool = True
+
+
+class ChangePasswordScheme(BaseModel):
+    old_password: str
+    new_password: str
