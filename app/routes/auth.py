@@ -49,18 +49,18 @@ async def register(
 
 @router.post("/token")
 async def login(
-    from_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Annotated[AsyncSession, Depends(database.get_session)],
 ) -> TokenSchema:
     credentials_exc = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentails"
+        status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
     )
 
     result = await session.execute(
-        select(UserModel).where(UserModel.username == from_data.username)
+        select(UserModel).where(UserModel.username == form_data.username)
     )
     user = result.scalars().first()
-    if user and verify_password(from_data.password, user.password):
+    if user and verify_password(form_data.password, user.password):
         token = create_access_token({"sub": user.username})
         return TokenSchema(access_token=token, token_type="bearer")
     else:
