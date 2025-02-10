@@ -21,5 +21,12 @@ def create_access_token(
     return encoded_jwt
 
 
+def create_refresh_token(
+    data: dict,
+) -> str:
+    encoded_jwt = jwt.encode(data, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
+    return encoded_jwt
+
+
 def decode_access_token(token: Annotated[str, Depends(oauth2_schema)]) -> dict:
     return jwt.decode(token, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))

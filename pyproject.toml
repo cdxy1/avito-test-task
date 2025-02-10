@@ -20,6 +20,7 @@ greenlet = "^3.1.1"
 loguru = "^0.7.3"
 pytest = "^8.3.4"
 alembic = "^1.14.1"
+aioredis = {extras = ["hiredis"], version = "^2.0.1"}
 
 
 [build-system]
