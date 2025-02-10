@@ -1,19 +1,22 @@
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, Depends, HTTPException, status
-
 
 from ..db import database
 from ..models.user import UserModel
 from ..schemas.token import TokenSchema
+from ..schemas.user import ChangePasswordScheme, UserDBSchema, UserInSchema, UserSchema
 from ..utils.hasher import hash_password, verify_password
-from ..utils.token_utils import create_access_token, decode_access_token
-from ..schemas.user import UserDBSchema, UserSchema, UserInSchema, ChangePasswordScheme
-
+from ..utils.redis_utlis import redis_client
+from ..utils.token_utils import (
+    create_access_token,
+    create_refresh_token,
+    decode_access_token,
+)
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -62,9 +65,32 @@ async def login(
     user = result.scalars().first()
     if user and verify_password(form_data.password, user.password):
         token = create_access_token({"sub": user.username})
-        return TokenSchema(access_token=token, token_type="bearer")
+        refresh_token = await create_refresh_token(user.username)
+        return TokenSchema(
+            access_token=token, refresh_token=refresh_token, token_type="bearer"
+        )
     else:
         raise credentials_exc
+
+
+@router.post("/refresh")
+async def refresh_access_token(
+    current_user: Annotated[dict, Depends(decode_access_token)],
+):
+    exc = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+    )
+
+    user = current_user.get("sub")
+
+    if not user:
+        raise exc
+
+    refresh_token = await redis_client.get_value(f"refresh:{user}")
+    if not refresh_token:
+        raise exc
+
+    return create_access_token(current_user)
 
 
 @router.get("/users/me")

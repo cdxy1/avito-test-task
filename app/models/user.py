@@ -1,7 +1,7 @@
-from ..db import Base
-
 from sqlalchemy import Integer
 from sqlalchemy.orm import Mapped, mapped_column
+
+from ..db import Base
 
 
 class UserModel(Base):

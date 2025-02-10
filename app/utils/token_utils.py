@@ -3,9 +3,12 @@ from datetime import datetime, timedelta
 from typing import Annotated
 
 import jwt
-from fastapi import Depends
 from dotenv import load_dotenv
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
+from jwt import DecodeError
+
+from .redis_utlis import redis_client
 
 load_dotenv()
 oauth2_schema = OAuth2PasswordBearer("/auth/token")
@@ -15,18 +18,33 @@ def create_access_token(
     data: dict,
 ) -> str:
     to_encode = data.copy()
-    expire = datetime.now() + timedelta(minutes=5)
+    expire = datetime.now() + timedelta(minutes=1)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
     return encoded_jwt
 
 
-def create_refresh_token(
-    data: dict,
+async def create_refresh_token(
+    username: str,
 ) -> str:
-    encoded_jwt = jwt.encode(data, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
+    expire = datetime.now() + timedelta(days=7)
+    encoded_jwt = jwt.encode(
+        {"sub": username, "exp": expire},
+        os.getenv("SECRET_KEY"),
+        os.getenv("ALGORITHM"),
+    )
+    await redis_client.set_value(username, encoded_jwt)
     return encoded_jwt
 
 
 def decode_access_token(token: Annotated[str, Depends(oauth2_schema)]) -> dict:
-    return jwt.decode(token, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
+    try:
+        payload = jwt.decode(token, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
+        exp = payload.get("exp")
+
+        if not exp or datetime.now() >= datetime.fromtimestamp(exp):
+            raise HTTPException(status_code=401, detail="Token expired or invalid")
+        return payload
+
+    except DecodeError:
+        raise HTTPException(status_code=401, detail="Token decode error")

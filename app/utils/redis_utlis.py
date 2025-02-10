@@ -1,12 +1,10 @@
-import os
 from typing import Optional
-from datetime import timedelta, datetime
 
-import aioredis
-from aioredis import Redis
+from redis import Redis
+from redis import asyncio as aioredis
 
 
-class RedisСlient:
+class RedisClient:
     def __init__(self, redis_url: str = "redis://localhost:6379"):
         self.redis_url = redis_url
         self.redis: Optional[Redis | None] = None
@@ -19,29 +17,23 @@ class RedisСlient:
             await self.redis.close()
 
     async def set_value(self, key: str, value: str):
-        from_env_exp = os.getenv("REDIS_EXPIRE_DAYS")
-        expire = (
-            datetime.now() + timedelta(int(from_env_exp))
-            if from_env_exp
-            else timedelta(days=7)
-        )
-
         try:
-            self.redis.setex(key, expire, value)
+            await self.redis.set(f"refresh:{key}", value)
         except:
-            pass
+            print("нихуя не работает")
 
     async def get_value(self, key):
         try:
-            return self.redis.get(key)
+            print(key)
+            return await self.redis.get(key)
         except:
             pass
 
     async def delete_value(self, key):
         try:
-            self.redis.delete(key)
+            await self.redis.delete(key)
         except:
             pass
 
 
-redis_client = RedisСlient()
+redis_client = RedisClient()
