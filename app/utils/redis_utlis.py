@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Optional
 
 from redis import Redis
@@ -16,16 +17,15 @@ class RedisClient:
         if self.redis:
             await self.redis.close()
 
-    async def set_value(self, key: str, value: str):
+    async def set_value(self, key: str, value: str, expire: timedelta):
         try:
-            await self.redis.set(f"refresh:{key}", value)
+            await self.redis.setex(f"refresh:{key}", expire, value)
         except:
             print("нихуя не работает")
 
     async def get_value(self, key):
         try:
-            print(key)
-            return await self.redis.get(key)
+            return await self.redis.get(f"refresh:{key}")
         except:
             pass
 

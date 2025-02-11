@@ -18,7 +18,7 @@ def create_access_token(
     data: dict,
 ) -> str:
     to_encode = data.copy()
-    expire = datetime.now() + timedelta(minutes=1)
+    expire = datetime.now() + timedelta(minutes=30)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
     return encoded_jwt
@@ -27,13 +27,13 @@ def create_access_token(
 async def create_refresh_token(
     username: str,
 ) -> str:
-    expire = datetime.now() + timedelta(days=7)
+    expire = timedelta(days=30)
     encoded_jwt = jwt.encode(
-        {"sub": username, "exp": expire},
+        {"sub": username},
         os.getenv("SECRET_KEY"),
         os.getenv("ALGORITHM"),
     )
-    await redis_client.set_value(username, encoded_jwt)
+    await redis_client.set_value(username, encoded_jwt, expire)
     return encoded_jwt
 
 
@@ -42,9 +42,20 @@ def decode_access_token(token: Annotated[str, Depends(oauth2_schema)]) -> dict:
         payload = jwt.decode(token, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
         exp = payload.get("exp")
 
-        if not exp or datetime.now() >= datetime.fromtimestamp(exp):
+        if not exp or datetime.now() >= datetime.utcfromtimestamp(exp):
             raise HTTPException(status_code=401, detail="Token expired or invalid")
         return payload
+
+    except DecodeError:
+        raise HTTPException(status_code=401, detail="Token decode error")
+
+
+def username_from_token(token: Annotated[str, Depends(oauth2_schema)]) -> dict:
+    try:
+        payload = jwt.decode(token, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
+        user = payload.get("sub")
+
+        return user
 
     except DecodeError:
         raise HTTPException(status_code=401, detail="Token decode error")

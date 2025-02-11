@@ -16,6 +16,7 @@ from ..utils.token_utils import (
     create_access_token,
     create_refresh_token,
     decode_access_token,
+    username_from_token,
 )
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -75,22 +76,22 @@ async def login(
 
 @router.post("/refresh")
 async def refresh_access_token(
-    current_user: Annotated[dict, Depends(decode_access_token)],
+    current_user: Annotated[str, Depends(username_from_token)],
 ):
     exc = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
     )
 
-    user = current_user.get("sub")
-
-    if not user:
+    if not current_user:
         raise exc
 
-    refresh_token = await redis_client.get_value(f"refresh:{user}")
+    refresh_token = await redis_client.get_value(current_user)
     if not refresh_token:
         raise exc
 
-    return create_access_token(current_user)
+    payload = {"sub": current_user}
+
+    return create_access_token(payload)
 
 
 @router.get("/users/me")
