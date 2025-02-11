@@ -31,7 +31,7 @@ class RedisClient:
 
     async def delete_value(self, key):
         try:
-            await self.redis.delete(key)
+            await self.redis.delete(f"refresh:{key}")
         except:
             pass
 

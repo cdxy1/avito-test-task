@@ -128,3 +128,10 @@ async def change_password(
     await session.commit()
 
     return {"status": "success"}
+
+
+@router.delete("/logout")
+async def logout(current_user: Annotated[dict, Depends(decode_access_token)]):
+    user = current_user.get("sub")
+    await redis_client.delete_value(user)
+    return {"status": "success"}
