@@ -10,13 +10,14 @@ from ..db import database
 from ..models.user import UserModel
 from ..schemas.token import TokenSchema
 from ..schemas.user import ChangePasswordScheme, UserDBSchema, UserInSchema, UserSchema
-from ..utils.hasher import hash_password, verify_password
 from ..utils.redis_utlis import redis_client
-from ..utils.token_utils import (
+from ..utils.security_utils import (
     create_access_token,
     create_refresh_token,
     decode_access_token,
+    hash_password,
     username_from_token,
+    verify_password,
 )
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
