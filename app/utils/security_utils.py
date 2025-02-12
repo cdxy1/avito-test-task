@@ -3,15 +3,23 @@ from datetime import datetime, timedelta
 from typing import Annotated
 
 import jwt
-from dotenv import load_dotenv
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt import DecodeError
+from passlib.context import CryptContext
 
 from .redis_utlis import redis_client
 
-load_dotenv()
+pwd_context = CryptContext(["bcrypt"])
 oauth2_schema = OAuth2PasswordBearer("/auth/token")
+
+
+def hash_password(password: str):
+    return pwd_context.hash(password)
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(
