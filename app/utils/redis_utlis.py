@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Optional
 
-from redis import Redis
+from redis import ConnectionError, Redis
 from redis import asyncio as aioredis
 
 
@@ -20,19 +20,19 @@ class RedisClient:
     async def set_value(self, key: str, value: str, expire: timedelta):
         try:
             await self.redis.setex(f"refresh:{key}", expire, value)
-        except:
-            print("нихуя не работает")
+        except ConnectionError:
+            print("не работает")
 
     async def get_value(self, key):
         try:
             return await self.redis.get(f"refresh:{key}")
-        except:
+        except ConnectionError:
             pass
 
     async def delete_value(self, key):
         try:
             await self.redis.delete(f"refresh:{key}")
-        except:
+        except ConnectionError:
             pass
 
 
