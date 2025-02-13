@@ -19,5 +19,5 @@ class PurchaseModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     from_user: Mapped[str]
-    item_name: Mapped[int] = mapped_column(primary_key=True)
+    item_name: Mapped[str]
     pub_date: Mapped[datetime] = mapped_column(default=datetime.utcnow)
