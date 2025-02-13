@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 from .redis_utlis import redis_client
 
 pwd_context = CryptContext(["bcrypt"])
-oauth2_schema = OAuth2PasswordBearer("/auth/token")
+oauth2_schema = OAuth2PasswordBearer("/auth")
 
 
 def hash_password(password: str):

@@ -15,7 +15,7 @@ from ..utils.info_utils import (
 from ..utils.security_utils import decode_access_token
 from ..utils.transaction_utils import check_balance, get_item_by_name
 
-router = APIRouter(prefix="/transaction", tags=["transaction"])
+router = APIRouter(tags=["Transaction"])
 
 
 @router.post("/buy/{item}")

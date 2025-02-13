@@ -20,7 +20,7 @@ from ..utils.security_utils import (
     verify_password,
 )
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter(tags=["Auth"])
 
 
 async def get_user_by_username(
@@ -52,7 +52,7 @@ async def register(
     return UserSchema(**user_dict)
 
 
-@router.post("/token")
+@router.post("/auth")
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Annotated[AsyncSession, Depends(database.get_session)],

@@ -23,7 +23,7 @@ class RedisClient:
         except ConnectionError:
             print("не работает")
 
-    async def get_value(self, key):
+    async def get_value(self, key) -> Optional[str]:
         try:
             return await self.redis.get(f"refresh:{key}")
         except ConnectionError:

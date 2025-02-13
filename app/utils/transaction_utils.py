@@ -15,6 +15,6 @@ async def get_item_by_name(session: AsyncSession, item_name: str) -> ItemModel:
     return item
 
 
-async def check_balance(user: UserModel, amount: int) -> None:
+async def check_balance(user: UserModel, amount: int):
     if user.balance < amount:
         raise HTTPException(status_code=400, detail="Insufficient balance")
