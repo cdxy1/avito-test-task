@@ -14,6 +14,7 @@ from ..schemas.response import (
     SentCoin,
     UserInfoResponse,
 )
+from ..schemas.transaction import BuySchema, SendSchema
 from ..utils.info_utils import (
     count_items,
     get_user_info,
@@ -29,7 +30,7 @@ router = APIRouter(tags=["Transaction"])
 
 @router.post("/buy/{item}")
 async def buy_item(
-    item: str,
+    item_info: BuySchema,
     current_user: Annotated[dict, Depends(decode_access_token)],
     session: Annotated[AsyncSession, Depends(database.get_session)],
 ):
@@ -44,7 +45,7 @@ async def buy_item(
             session,
         )
         item = await get_item_by_name(
-            item,
+            item_info.item,
             session,
         )
 
@@ -60,9 +61,8 @@ async def buy_item(
 
 @router.post("/sendCoin")
 async def send_coin(
-    to_user: str,
+    user_info: SendSchema,
     current_user: Annotated[dict, Depends(decode_access_token)],
-    amount: int,
     session: Annotated[AsyncSession, Depends(database.get_session)],
 ):
     username = current_user.get("sub")
@@ -72,16 +72,18 @@ async def send_coin(
 
     async with session.begin():
         from_user = await get_user_info(username, session)
-        to_user_obj = await get_user_info(to_user, session)
+        to_user_obj = await get_user_info(user_info.user, session)
 
-        await check_balance(from_user, amount)
+        await check_balance(from_user, user_info.amount)
 
         transfer = TransferModel(
-            from_user=from_user.username, to_user=to_user, amount=amount
+            from_user=from_user.username,
+            to_user=user_info.user,
+            amount=user_info.amount,
         )
 
-        from_user.balance -= amount
-        to_user_obj.balance += amount
+        from_user.balance -= user_info.amount
+        to_user_obj.balance += user_info.amount
         session.add(transfer)
 
     response = ResponseSchema(detail="Успешный ответ.")
