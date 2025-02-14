@@ -1,11 +1,13 @@
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 
 from .db import database
 from .routes.auth import router as auth_router
 from .routes.transaction import router as transaction_router
+from .schemas.response import ResponseSchema
 from .utils.redis_utlis import redis_client
 
 load_dotenv()
@@ -26,3 +28,16 @@ app = FastAPI(lifespan=lifespan, root_path="/api")
 
 app.include_router(auth_router)
 app.include_router(transaction_router)
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    if exc.status_code == 400:
+        error_400_response = ResponseSchema(detail="Неверный запрос.")
+        return JSONResponse(status_code=400, content=error_400_response.dict())
+    if exc.status_code == 401:
+        error_401_response = ResponseSchema(detail="Неавторизован.")
+        return JSONResponse(status_code=401, content=error_401_response.dict())
+    if exc.status_code == 500:
+        error_500_response = ResponseSchema(detail="Внутренняя ошибка сервера.")
+        return JSONResponse(status_code=500, content=error_500_response.dict())
