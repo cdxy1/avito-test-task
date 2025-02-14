@@ -6,7 +6,7 @@ from ..models.transaction import PurchaseModel, TransferModel
 from ..models.user import UserModel
 
 
-async def get_user_info(session: AsyncSession, username: str) -> UserModel:
+async def get_user_info(username: str, session: AsyncSession) -> UserModel:
     query = select(UserModel).filter(UserModel.username == username)
     result = await session.execute(query)
     user = result.scalars().first()
@@ -15,7 +15,7 @@ async def get_user_info(session: AsyncSession, username: str) -> UserModel:
     return user
 
 
-async def get_user_transfers(session: AsyncSession, username: str):
+async def get_user_transfers(username: str, session: AsyncSession):
     query = select(TransferModel).filter(
         or_(TransferModel.to_user == username, TransferModel.from_user == username)
     )
@@ -23,7 +23,7 @@ async def get_user_transfers(session: AsyncSession, username: str):
     return result.scalars().all()
 
 
-async def get_user_purchases(session: AsyncSession, username: str):
+async def get_user_purchases(username: str, session: AsyncSession):
     query = select(PurchaseModel).filter(PurchaseModel.from_user == username)
     result = await session.execute(query)
     return result.scalars().all()
