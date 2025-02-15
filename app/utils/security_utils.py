@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt import DecodeError
 from passlib.context import CryptContext
 
-from .redis_utlis import redis_client
+from .redis_utils import redis_client
 
 pwd_context = CryptContext(["bcrypt"])
 oauth2_schema = OAuth2PasswordBearer("/auth")
