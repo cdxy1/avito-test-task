@@ -1,0 +1,33 @@
+---------- coverage: platform darwin, python 3.12.0-final-0 ----------
+Name                               Stmts   Miss  Cover
+------------------------------------------------------
+app/__init__.py                        0      0   100%
+app/db.py                             22      4    82%
+app/init_data.py                       8      8     0%
+app/main.py                           32      3    91%
+app/models/__init__.py                 0      0   100%
+app/models/item.py                     7      0   100%
+app/models/transaction.py             16      0   100%
+app/models/user.py                    10      0   100%
+app/routes/__init__.py                 0      0   100%
+app/routes/auth.py                    72     22    69%
+app/routes/transaction.py             55     26    53%
+app/schemas/__init__.py                0      0   100%
+app/schemas/response.py               24      0   100%
+app/schemas/transaction.py             4      0   100%
+app/schemas/user.py                   11      0   100%
+app/utils/__init__.py                  0      0   100%
+app/utils/info_utils.py               35      7    80%
+app/utils/redis_utils.py              34      6    82%
+app/utils/security_utils.py           42      5    88%
+app/utils/transaction_utils.py        15      4    73%
+locustfile.py                         45     45     0%
+tests/__init__.py                      0      0   100%
+tests/conftest.py                     35      1    97%
+tests/routes/__init__.py               0      0   100%
+tests/routes/test_auth.py             72      0   100%
+tests/routes/test_transaction.py      81      0   100%
+------------------------------------------------------
+TOTAL                                620    131    79%
+
+=============================================== 17 passed, 30 warnings in 3.09s ================================================
