@@ -25,7 +25,6 @@
 - `passlib`
 - `pyjwt`
 - `bcrypt`
-- `aiosqlite`
 - `alembic`
 - `redis`
 - `asyncpg`
@@ -33,6 +32,7 @@
 
 Для разработки и тестирования:
 - `ruff`
+- `aiosqlite`
 - `pytest-asyncio`
 - `httpx`
 - `pytest-cov`
