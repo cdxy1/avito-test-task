@@ -16,7 +16,7 @@ from ..schemas.response import (
 )
 from ..schemas.user import ChangePasswordScheme, UserDBSchema, UserInSchema
 from ..utils.info_utils import get_user_info
-from ..utils.redis_utlis import redis_client
+from ..utils.redis_utils import redis_client
 from ..utils.security_utils import (
     create_access_token,
     create_refresh_token,
@@ -104,7 +104,7 @@ async def refresh_access_token(
     return JSONResponse(status_code=status.HTTP_200_OK, content=response.model_dump())
 
 
-@router.patch("/users/change_password")
+@router.patch("/change_password")
 async def change_password(
     passwords: ChangePasswordScheme,
     current_user: Annotated[dict, Depends(decode_access_token)],
