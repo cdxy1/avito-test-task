@@ -7,13 +7,12 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import declarative_base
 
 load_dotenv()
 
 
-class Base(DeclarativeBase):
-    pass
+Base = declarative_base()
 
 
 class Database:
