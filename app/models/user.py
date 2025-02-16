@@ -7,7 +7,7 @@ class UserModel(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(autoincrement=True, primary_key=True)
-    username: Mapped[str] = mapped_column(unique=True, nullable=False)
+    username: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
     password: Mapped[str] = mapped_column(nullable=False)
     role: Mapped[str]
     balance: Mapped[int] = mapped_column(default=1000, nullable=False)

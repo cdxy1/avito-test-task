@@ -7,5 +7,5 @@ class ItemModel(Base):
     __tablename__ = "items"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(index=True)
     price: Mapped[int]
