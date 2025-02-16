@@ -1,6 +1,5 @@
 from contextlib import asynccontextmanager
 
-from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 
@@ -9,13 +8,10 @@ from .routes.transaction import router as transaction_router
 from .schemas.response import ResponseSchema
 from .utils.redis_utils import redis_client
 
-load_dotenv()
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await redis_client.connect()
-
     yield
 
     await redis_client.close()
