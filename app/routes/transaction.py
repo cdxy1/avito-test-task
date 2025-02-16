@@ -14,7 +14,7 @@ from ..schemas.response import (
     SentCoin,
     UserInfoResponse,
 )
-from ..schemas.transaction import BuySchema, SendSchema
+from ..schemas.transaction import SendSchema
 from ..utils.info_utils import (
     count_items,
     get_user_info,
@@ -30,7 +30,7 @@ router = APIRouter(tags=["Transaction"])
 
 @router.post("/buy/{item}")
 async def buy_item(
-    item_info: BuySchema,
+    item: str,
     current_user: Annotated[dict, Depends(decode_access_token)],
     session: Annotated[AsyncSession, Depends(database.get_session)],
 ):
@@ -44,15 +44,18 @@ async def buy_item(
             username,
             session,
         )
-        item = await get_item_by_name(
-            item_info.item,
+        item_from_db = await get_item_by_name(
+            item,
             session,
         )
 
-        await check_balance(user, item.price)
+        if item_from_db is None:
+            raise HTTPException(status_code=404, detail="Item not found")
 
-        purchase = PurchaseModel(from_user=user.username, item_name=item.name)
-        user.balance -= item.price
+        await check_balance(user, item_from_db.price)
+
+        purchase = PurchaseModel(from_user=user.username, item_name=item_from_db.name)
+        user.balance -= item_from_db.price
         session.add(purchase)
 
     response = ResponseSchema(detail="Успешный ответ.")
