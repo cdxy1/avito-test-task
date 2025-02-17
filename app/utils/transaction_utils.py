@@ -11,10 +11,10 @@ async def get_item_by_name(item_name: str, session: AsyncSession) -> ItemModel:
     result = await session.execute(query)
     item = result.scalars().first()
     if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(status_code=404, detail="Не найдено.")
     return item
 
 
 async def check_balance(user: UserModel, amount: int):
     if user.balance < amount:
-        raise HTTPException(status_code=400, detail="Insufficient balance")
+        raise HTTPException(status_code=400, detail="Неверный запрос.")
