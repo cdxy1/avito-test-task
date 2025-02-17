@@ -58,7 +58,7 @@ def decode_access_token(token: Annotated[str, Depends(oauth2_schema)]) -> dict:
         raise HTTPException(status_code=401, detail="Token decode error")
 
 
-def username_from_token(token: Annotated[str, Depends(oauth2_schema)]) -> dict:
+def user_id_from_token(token: Annotated[str, Depends(oauth2_schema)]) -> dict:
     try:
         payload = jwt.decode(token, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
         user = payload.get("sub")

@@ -176,7 +176,6 @@ POST     /api/sendCoin                                         130    260    370
 ├── app
 │   ├── __init__.py
 │   ├── db.py
-│   ├── init_data.py
 │   ├── main.py
 │   ├── models
 │   │   ├── __init__.py
@@ -198,6 +197,7 @@ POST     /api/sendCoin                                         130    260    370
 │       ├── redis_utils.py
 │       ├── security_utils.py
 │       └── transaction_utils.py
+│
 ├── docker-compose.yml
 ├── locustfile.py
 ├── migrations
@@ -209,14 +209,14 @@ POST     /api/sendCoin                                         130    260    370
 ├── poetry.lock
 ├── pyproject.toml
 ├── ruff.toml
-├── tests
-│   ├── __init__.py
-│   ├── conftest.py
-│   └── routes
-│       ├── __init__.py
-│       ├── test_auth.py
-│       └── test_transaction.py
-└── users.db
+└── tests
+    ├── __init__.py
+    ├── conftest.py
+    └── routes
+        ├── __init__.py
+        ├── test_auth.py
+        └── test_transaction.py
+
 ```
 
 ## Лицензия

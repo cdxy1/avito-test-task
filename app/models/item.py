@@ -1,4 +1,6 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from typing import List
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..db import Base
 
@@ -9,3 +11,5 @@ class ItemModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(index=True)
     price: Mapped[int]
+
+    purchases: Mapped[List["PurchaseModel"]] = relationship(back_populates="item")  # noqa: F821

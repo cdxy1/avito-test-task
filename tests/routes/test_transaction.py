@@ -2,6 +2,7 @@ import pytest
 from fastapi import status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.transaction import PurchaseModel
 from app.models.user import UserModel
@@ -50,13 +51,19 @@ async def test_buy_item_success(client, create_init_data, session: AsyncSession)
         select(UserModel).where(UserModel.username == "test_user")
     )
     user = result.scalars().first()
+    assert user is not None
     assert user.balance == 920
 
-    result = await session.execute(select(PurchaseModel))
+    result = await session.execute(
+        select(PurchaseModel).options(
+            selectinload(PurchaseModel.user), selectinload(PurchaseModel.item)
+        )
+    )
     purchase = result.scalars().first()
     assert purchase is not None
-    assert purchase.from_user == "test_user"
-    assert purchase.item_name == "t-shirt"
+
+    assert purchase.user.username == "test_user"
+    assert purchase.item.name == "t-shirt"
 
 
 @pytest.mark.asyncio

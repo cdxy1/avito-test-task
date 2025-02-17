@@ -3,8 +3,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from .db import database
-from .init_data import create_init_data
 from .routes.auth import router as auth_router
 from .routes.transaction import router as transaction_router
 from .schemas.response import ResponseSchema
@@ -14,10 +12,7 @@ from .utils.redis_utils import redis_client
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await redis_client.connect()
-    await database.create_tables()
-    await create_init_data()
     yield
-
     await redis_client.close()
 
 
